@@ -8,6 +8,7 @@ import sys
 
 from graphql import graphql_pb2_grpc
 from graphql.graphql_pb2 import Request
+from google.protobuf.struct_pb2 import Struct
 
 #
 # Code from getting started will go here ...
@@ -43,16 +44,18 @@ def create_client(token, endpoint):
 
 
 def stream_ethereum(client):
+    variables = Struct()
+    variables.update({
+      "addresses": ["0x7a250d5630b4cf539739df2c5dacb4c659f2488d"],
+      "fields": ["FROM", "ERC20_FROM"],
+    })
+
     # The client can be re-used for all requests, cache it at the appropriate level
     stream = client.Execute(
         Request(
             query=OPERATION_ETH,
-            variables=json.dumps({
-                "addresses": ["0x7a250d5630b4cf539739df2c5dacb4c659f2488d"],
-                "fields": ["FROM", "ERC20_FROM"],
-            })
+            variables=variables,
         )
-        
     )
 
     for rawResult in stream:
